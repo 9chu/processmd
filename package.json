@@ -33,6 +33,7 @@
   "author": "Tim Scanlin",
   "license": "MIT",
   "dependencies": {
+    "@9chu/markdown-it-katex": "github:9chu/markdown-it-katex",
     "globby": "^6.1.0",
     "highlight.js": "^9.11.0",
     "js-yaml": "^3.8.3",

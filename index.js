@@ -32,6 +32,9 @@ function processmd (options, callback) {
   if (options.headingIds) {
     markdownIt.use(require('markdown-it-named-headings'))
   }
+  if (options.renderMathExpressions) {
+    markdownIt.use(require('@9chu/markdown-it-katex'), { throwOnError: false, errorColor: "#cc0000" })
+  }
 
   options.markdownRenderer = options.markdownRenderer || function mdRender (str) { return markdownIt.render(str) }
 
