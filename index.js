@@ -20,6 +20,16 @@ const FRONTMATTER_SEPERATOR = '---'
 
 const SOURCE_MODE = 'source'
 
+function isCJK(ch) {
+  // not fully covered
+  let n = ch.codePointAt(0);
+  if (0x4E00 <= n <= 0x9FCC)  // CJK Unified Ideographs
+    return true;
+  if (0x3400 <= n <= 0x4DB5)  // CJK Unified Ideographs Extensions A
+    return true;
+  return false;
+}
+
 // Main function
 function processmd (options, callback) {
   options = Object.assign({}, defaultOptions, options)
@@ -165,7 +175,7 @@ function processYamlAndMarkdown (file, options, cb) {
       let i = splitPoint
       while (i < options.preview) {
         i++
-        if (preview[i] === ' ') {
+        if (preview[i] === ' ' || isCJK(preview[i])) {
           splitPoint = i
         }
         if (preview[i] === undefined) {
