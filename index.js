@@ -175,12 +175,12 @@ function processYamlAndMarkdown (file, options, cb) {
       let i = splitPoint
       while (i < options.preview) {
         i++
-        if (preview[i] === ' ' || isCJK(preview[i])) {
-          splitPoint = i
-        }
         if (preview[i] === undefined) {
           splitPoint = i
           break
+        }
+        if (preview[i] === ' ' || isCJK(preview[i])) {
+          splitPoint = i
         }
       }
       jsonData.preview = preview.substring(0, splitPoint).trim()
