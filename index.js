@@ -34,6 +34,17 @@ function isCJK(ch) {
 function processmd (options, callback) {
   options = Object.assign({}, defaultOptions, options)
 
+  if (options.linkRelativeToCommonPath === true || options.linkBaseDir !== null) {
+    options.markdownOptions.replaceLink = function (link, env) {
+      let isRelativeLink = !link.startsWith('/') && !link.startsWith('|') && (link.indexOf(':') < 0)
+      if (isRelativeLink && options.linkRelativeToCommonPath)
+        link = path.join(path.dirname(env.baseFilename), link)
+      if (isRelativeLink && options.linkBaseDir)
+        link = path.join(options.linkBaseDir, link)
+      return link
+    }
+  }
+
   const markdownIt = MarkdownIt(options.markdownOptions)
 
   if (options.highlightCode) {
@@ -45,8 +56,11 @@ function processmd (options, callback) {
   if (options.renderMathExpressions) {
     markdownIt.use(require('@9chu/markdown-it-katex'), { throwOnError: false, errorColor: "#cc0000" })
   }
+  if (options.markdownOptions.replaceLink) {
+    markdownIt.use(require('markdown-it-replace-link'))
+  }
 
-  options.markdownRenderer = options.markdownRenderer || function mdRender (str) { return markdownIt.render(str) }
+  options.markdownRenderer = options.markdownRenderer || function mdRender (str, baseFilename) { return markdownIt.render(str, { baseFilename: baseFilename }) }
 
   const globs = (options.files || []).concat(options._ || [])
   if (globs.length === 0) {
@@ -148,17 +162,17 @@ function processYamlAndMarkdown (file, options, cb) {
       content = fileContent.substring(splitContent[0].length).trim()
     }
 
+    const baseFilename = file.replace(options._commonDir, '')
     if (isYaml) {
       jsonData = yaml.safeLoad(content)
     } else {
       jsonData = Object.assign({}, frontmatter, {
         bodyContent: content,
-        bodyHtml: options.markdownRenderer(content)
+        bodyHtml: options.markdownRenderer(content, baseFilename)
       })
     }
 
     // Rename to the new file.
-    const baseFilename = file.replace(options._commonDir, '')
     const parsedPath = path.parse(path.join(options.outputDir, baseFilename))
     const sourceExt = parsedPath.ext
     const sourceBase = parsedPath.base

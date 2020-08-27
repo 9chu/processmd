@@ -40,5 +40,9 @@ module.exports = {
   headingIds: false,
   // Use Katex to render math expressions
   // See https://github.com/iktakahiro/markdown-it-katex/
-  renderMathExpressions: true
+  renderMathExpressions: true,
+  // Fix relative links inside markdown files
+  linkRelativeToCommonPath: false,
+  // Addtional prefix path for links inside markdown files
+  linkBaseDir: null
 }
